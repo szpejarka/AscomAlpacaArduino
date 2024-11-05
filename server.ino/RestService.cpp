@@ -1,5 +1,6 @@
 #include "RestService.h"
-#include <ArduinoJson.h>
+#include <iostream>
+#include <string>
 
 RestService::RestService(const int port, MotorsController& motorsCtrl) :
     server(port), motorsController(motorsCtrl) {}
@@ -93,7 +94,7 @@ void RestService::alpacainit() {
           \"ServerTransactionID\": 0, \
           \"ErrorNumber\": 0, \
           \"ErrorMessage\": \"\", \
-          \"Value\": false \
+          \"Value\": true \
         }");
     });      
 
@@ -153,35 +154,70 @@ void RestService::alpacainit() {
     });
 
 
-    server.on("/api/v1/telescope/0/slewtocoordinates", [this]() {
+    server.on("/api/v1/telescope/0/slewtocoordinatesasync", [this]() {
       handleRest();
-      if (server.hasArg("plain")) {
-        String requestBody = server.arg("plain");
-        StaticJsonDocument<200> jsonDoc;
-        DeserializationError error = deserializeJson(jsonDoc, requestBody);
-        if (error) {
-            server.send(400, "application/json", "{\"Error\": \"Invalid JSON format\"}");
-            return;
-        }
-        double rightAscension = jsonDoc["RightAscension"];
-        double declination = jsonDoc["Declination"];
 
-        Serial.print("RightAscension: ");
-        Serial.println(rightAscension);
-        Serial.print("Declination: ");
-        Serial.println(declination);
+      double rightAscension;// = jsonDoc["RightAscension"];
+      double declination;// = jsonDoc["Declination"];
 
-        server.send(200, "application/json", 
-          "{ \
-              \"ClientTransactionID\": 0, \
-              \"ServerTransactionID\": 0, \
-              \"ErrorNumber\": 0, \
-              \"ErrorMessage\": \"\" \
-          }");
-    } else {
-        server.send(400, "application/json", "{\"Error\": \"No JSON body provided\"}");
-    }
+      for (uint8_t i = 0; i < server.args(); i++) {
+          if(server.argName(i) == "RightAscension"){
+              rightAscension = server.arg(i).toDouble();
+          }
+          else if(server.argName(i) == "Declination"){
+              declination = server.arg(i).toDouble();
+          }
+      }
+      Serial.print("Slew RA: ");
+      Serial.println(rightAscension);
+      Serial.print("Slew DEC: ");
+      Serial.println(declination);
+
+      motorsController.slewToCoordinates(declination, rightAscension);
+
+      server.send(200, "application/json", 
+        "{ \
+            \"ClientTransactionID\": 0, \
+            \"ServerTransactionID\": 0, \
+            \"ErrorNumber\": 0, \
+            \"ErrorMessage\": \"\" \
+        }");
     });
+
+    server.on("/api/v1/telescope/0/slewing", [this]() {
+      handleRest();
+      bool isSlewing = motorsController.isSlewing();
+      String value = "";
+      if(isSlewing){ value = "true"; }
+      else { value = "false"; }
+      server.send(200, "application/json", 
+        "{ \
+          \"ClientTransactionID\": 0, \
+          \"ServerTransactionID\": 0, \
+          \"ErrorNumber\": 0, \
+          \"ErrorMessage\": \"\", \
+          \"Value\":" + value + 
+        "}");
+      Serial.print("Slewing: ");
+      Serial.println(value);
+    });
+
+
+    server.on("/api/v1/telescope/0/abortslew", [this]() {
+      handleRest();
+      motorsController.abortSlewing();
+      server.send(200, "application/json", 
+        "{ \
+          \"ClientTransactionID\": 0, \
+          \"ServerTransactionID\": 0, \
+          \"ErrorNumber\": 0, \
+          \"ErrorMessage\": \"\", \
+          \"Value\": true \
+        }");
+      Serial.println("Aborted slewing");
+    });
+
+
 
 
     server.onNotFound([this]() { handleNotFound(); });
@@ -208,13 +244,13 @@ String RestService::handleRest() {
     for (uint8_t i = 0; i < server.args(); i++) {
       message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
     }
-    Serial.print(message);
+    //Serial.print(message);
     return message;
 }
 
 
 void RestService::handleNotFound() {
-    Serial.print("\n\nFile Not Found");
+    //Serial.print("\n\nFile Not Found");
     String message = handleRest();
     handleRoot(message);
     digitalWrite(led, 0);

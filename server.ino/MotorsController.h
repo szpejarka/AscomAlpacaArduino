@@ -4,19 +4,22 @@
 class MotorsController {
   public:
     MotorsController(unsigned long epochTime);
-    static void setRA(double raValueH);
-    static void setDEC(double decValueDeg);
-    static double getRA();
-    static double getDEC();
+    void setRA(double raValueH);
+    void setDEC(double decValueDeg);
+    double getRA();
+    double getDEC();
+    void slewToCoordinates(double decValueDeg, double raValueH);
+    bool isSlewing();
+    bool abortSlewing();
 
   private:
-    static double ra;
-    static double dec;
     static const double longitude;
 
     double calculateJulianDate(int year, int month, int day, double ut);
     double calculateGST(double JD);
     double calculateLST(int year, int month, int day, double ut, double longitude);
+    void motorsetupRA();
+    void motorsetupDEC();
 };
 
 #endif
