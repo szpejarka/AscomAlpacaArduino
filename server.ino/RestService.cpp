@@ -24,7 +24,7 @@ void RestService::alpacainit() {
 
   server.on("/api/v1/telescope/0/connected", [this]() {
       handleRest();
-      if(server.method() == HTTP_POST)
+      if(server.method() == HTTP_PUT)
       {
         server.send(200, "application/json", 
           "{ \
@@ -143,14 +143,37 @@ void RestService::alpacainit() {
 
   server.on("/api/v1/telescope/0/tracking", [this]() {
       handleRest();
-      server.send(200, "application/json", 
-        "{ \
-          \"ClientTransactionID\": 0, \
-          \"ServerTransactionID\": 0, \
-          \"ErrorNumber\": 0, \
-          \"ErrorMessage\": \"\", \
-          \"Value\": false \
-        }");
+      bool tracking = false;
+      if(server.method() == HTTP_PUT){
+          for (uint8_t i = 0; i < server.args(); i++){
+              if(server.argName(i) == "Tracking"){
+                  tracking = (server.arg(i) == "True");
+              }
+          }
+          if(tracking) { motorsController.startTracking(); }
+          else { motorsController.stopTracking(); }
+          server.send(200, "application/json", 
+            "{ \
+                \"ClientTransactionID\": 0, \
+                \"ServerTransactionID\": 0, \
+                \"ErrorNumber\": 0, \
+                \"ErrorMessage\": \"\" \
+            }");
+      }
+      else {
+          bool isTracking = motorsController.isTracking();
+          String value = "";
+          if(isTracking){ value = "true"; }
+          else { value = "false"; }
+          server.send(200, "application/json", 
+            "{ \
+              \"ClientTransactionID\": 0, \
+              \"ServerTransactionID\": 0, \
+              \"ErrorNumber\": 0, \
+              \"ErrorMessage\": \"\", \
+              \"Value\":" + value + 
+            "}");
+      }
     });
 
 
@@ -168,11 +191,6 @@ void RestService::alpacainit() {
               declination = server.arg(i).toDouble();
           }
       }
-      Serial.print("Slew RA: ");
-      Serial.println(rightAscension);
-      Serial.print("Slew DEC: ");
-      Serial.println(declination);
-
       motorsController.slewToCoordinates(declination, rightAscension);
 
       server.send(200, "application/json", 
@@ -198,8 +216,6 @@ void RestService::alpacainit() {
           \"ErrorMessage\": \"\", \
           \"Value\":" + value + 
         "}");
-      Serial.print("Slewing: ");
-      Serial.println(value);
     });
 
 
@@ -216,6 +232,30 @@ void RestService::alpacainit() {
         }");
       Serial.println("Aborted slewing");
     });
+
+    server.on("/api/v1/telescope/0/trackingrates", [this]() {
+      handleRest();
+      server.send(200, "application/json", 
+        "{ \
+          \"ClientTransactionID\": 0, \
+          \"ServerTransactionID\": 0, \
+          \"ErrorNumber\": 0, \
+          \"ErrorMessage\": \"\", \
+          \"Value\": [0] \
+        }");
+    });
+
+    server.on("/api/v1/telescope/0/trackingrate", [this]() {
+      handleRest();
+      server.send(200, "application/json", 
+        "{ \
+          \"ClientTransactionID\": 0, \
+          \"ServerTransactionID\": 0, \
+          \"ErrorNumber\": 0, \
+          \"ErrorMessage\": \"\", \
+          \"Value\": 0 \
+        }");
+    });      
 
 
 

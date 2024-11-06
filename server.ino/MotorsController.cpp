@@ -10,7 +10,7 @@ const double MotorsController::longitude = 15.75;      // Hardcoded longitude
 
 const int STEPS_PER_DEGREE = 10240;
 const double DEGREE_PER_ONE_STEP = 0.000097656;
-const int TUS_2_DEG_PER_SECOND = 195;
+const int TUS_1_DEG_PER_SECOND = 98;
 
 // Motor RA
 const int MOTOR_STEP_RA = 22;
@@ -35,30 +35,31 @@ bool dec_is_slewing = false;
 // Tracking RA
 int step_tick_TRACK = 0;
 hw_timer_t *timerTRACK = NULL;
-bool isTracking = false;
-const int TUS_TRACKING = 23375;
+bool isTRACK = false;
+const int TUS_TRACKING = 233;//23375;
 
 void handleStopDEC() {
     digitalWrite(MOTOR_EN_DEC, 1); 
-    Serial.println("DEC axis stopped");  
     timerStop(timerDEC);
 }
 
 void handleStopRA() {
-    digitalWrite(MOTOR_EN_RA, 1); 
-    Serial.println("RA axis stopped");  
+    digitalWrite(MOTOR_EN_RA, 1);  
     timerStop(timerRA);
 }
 
 void handleStopTRACK() {
     digitalWrite(MOTOR_EN_RA, 1); 
-    Serial.println("Tracking stopped");  
+    isTRACK = false;
     timerStop(timerTRACK);
+    //Serial.println("Tracking stopped"); 
 }
 
 void IRAM_ATTR timerInterruptRA() {
     digitalWrite(MOTOR_STEP_RA, step_tick_RA);
     ra = ra + (DEGREE_PER_ONE_STEP * ra_slew_dir);
+    if(ra > 360){ ra = ra - 360; }
+    else if(ra < 0){ ra = ra + 360; }
     cyclesToDoRA--;
     step_tick_RA = (step_tick_RA + 1) % 2;
     if(cyclesToDoRA <= 0){
@@ -67,8 +68,8 @@ void IRAM_ATTR timerInterruptRA() {
     }
 }
 
-oid IRAM_ATTR timerInterruptTRACK() {
-    digitalWrite(MOTOR_STEP_RA, step_tick_RA);
+void IRAM_ATTR timerInterruptTRACK() {
+    digitalWrite(MOTOR_STEP_RA, step_tick_TRACK);
     step_tick_TRACK = (step_tick_TRACK + 1) % 2;
 }
 
@@ -106,11 +107,10 @@ void handleStartRA(int Tus, int cycles) {
 
 void handleStartTrack(){
   digitalWrite(MOTOR_EN_RA, 0);
-  digitalWrite(MOTOR_DIR_RA, 1);
+  digitalWrite(MOTOR_DIR_RA, 0);
   timerStart(timerTRACK);
   timerAlarm(timerTRACK, TUS_TRACKING, true, 0);
-  isTracking = true;
-  Serial.println("Tracking started");
+  isTRACK = true;
 }
 
 void MotorsController::motorsetupRA(){
@@ -122,7 +122,7 @@ void MotorsController::motorsetupRA(){
     timerRA = timerBegin(1000000); // Timer 0, clock divisor 80
     timerAttachInterrupt(timerRA, timerInterruptRA); // Attach the interrupt handling function
 
-    timerTRACK = timerBegin(1000000)
+    timerTRACK = timerBegin(1000000);
     timerAttachInterrupt(timerTRACK, timerInterruptTRACK);
   }
 
@@ -142,14 +142,24 @@ MotorsController::MotorsController(unsigned long epochTime) {
     int day = 1 + ((epochTime % 31556926) % 2629743) / 86400;
     double hour = (epochTime % 86400) / 3600.0;
 
+    Serial.print("Year : ");
+    Serial.println(year);
+    Serial.print("Month : ");
+    Serial.println(month);
+    Serial.print("Day : ");
+    Serial.println(day);
+    Serial.print("Hour : ");
+    Serial.println(hour);
+
     ra = calculateLST(year, month, day, hour, longitude);
 
     Serial.print("Right Ascension (RA) set to: ");
     Serial.print(getRA(), 6);
     Serial.println(" hours");
 
-    motorsetupRA();
     motorsetupDEC();
+    motorsetupRA();
+    
 }
 
 
@@ -184,6 +194,21 @@ bool MotorsController::abortSlewing(){
     cyclesToDoRA = 0;
     return true;
 }
+
+
+  void MotorsController::startTracking(){
+      Serial.println("Tracking started");
+      handleStartTrack();
+  }
+
+  void MotorsController::stopTracking(){
+    Serial.println("Tracking stopped");
+      handleStopTRACK();
+  }
+
+  bool MotorsController::isTracking(){
+      return isTRACK;
+  }
 
 
 void MotorsController::slewToCoordinates(double decValueDeg, double raValueH){
@@ -224,13 +249,15 @@ void MotorsController::slewToCoordinates(double decValueDeg, double raValueH){
   Serial.print("Steps RA ");
   Serial.println(stepsRA);
 
-  Serial.println("DEC axis started");
-  if(deltaDEC != 0){
-      handleStartDEC(TUS_2_DEG_PER_SECOND, stepsDEC);
+  
+  if(stepsDEC > 0){
+      handleStartDEC(TUS_1_DEG_PER_SECOND/2, stepsDEC);
+      Serial.println("Slewing DEC axis started");
       dec_is_slewing = true;
   }
-  if(deltaRA != 0){
-      handleStartRA(TUS_2_DEG_PER_SECOND, stepsRA);
+  if(stepsRA > 0){
+      handleStartRA(TUS_1_DEG_PER_SECOND/2, stepsRA);
+      Serial.println("Slewing RA axis started");
       ra_is_slewing = true;
   }
 }

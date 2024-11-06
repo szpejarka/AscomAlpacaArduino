@@ -11,6 +11,9 @@ class MotorsController {
     void slewToCoordinates(double decValueDeg, double raValueH);
     bool isSlewing();
     bool abortSlewing();
+    void startTracking();
+    void stopTracking();
+    bool isTracking();
 
   private:
     static const double longitude;
