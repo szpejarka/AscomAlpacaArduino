@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project develops a versatile control system for an equatorial astrophotography mount using an ESP32 microcontroller.
+This project develops a versatile control system for an equatorial astrophotography mount using an **ESP32 microcontroller**.
 The system aims to provide precise tracking and control over Right Ascension (RA) and Declination (Dec) axes via stepper motors with microstepping drivers.
 With remote communication capabilities enabled by Wi-Fi, the system allows seamless integration with popular astronomical software such as [N.I.N.A.](https://nighttime-imaging.eu/) and with them supports advanced functions like Slew with Plate Solving and Three-Point Polar Alignment.
 Additionally, a GPS module is used to accurately determine location data, aligning the coordinate system for precise celestial tracking.
@@ -27,7 +27,7 @@ The equatorial mount design relies on two primary axes:
 - **Declination (Dec)**: Controls the north-south movement, allowing adjustment of the telescope’s vertical position relative to the celestial equator.
 
 Microstepping for both RA and Dec axes is achieved through the use of stepper motors driven by microstepping drivers.
-The ESP32 controller manages these microsteps via interrupt routines, ensuring accurate and timely control for each step.
+The ESP32 controller manages these microsteps via low level **interrupt routines**, ensuring accurate and timely control for each step.
 This level of control is essential for long-exposure astrophotography, where even minor tracking inaccuracies can lead to blurring in the final image.
 
 ### Current Implementation of Alpaca REST API
@@ -40,7 +40,7 @@ The Alpaca REST API serves as the primary communication layer for this system, f
 - **Parking**: Supports a park function, enabling the mount to return to a predefined safe position when not in use, protecting equipment and ensuring easy restarts.
 
 For more details on the Alpaca API, refer to the [Alpaca REST API specification](https://ascom-standards.org/Alpaca/).
-Please note that not all endpoints are currently implemented; future updates will include additional functions, such as guiding support with GuidePulse for fine-tuned adjustments.
+Please note that not all endpoints are currently implemented; future updates will include additional functions, such as guiding support with GuidePulse.
 
 ## Planned Enhancements
 
