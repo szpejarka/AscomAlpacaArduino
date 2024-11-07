@@ -39,7 +39,7 @@ The Alpaca REST API serves as the primary communication layer for this system, f
 - **Syncing Coordinates (EQ)**: Allows synchronization of the mount’s coordinates with the telescope’s actual position in equatorial mode.
 - **Parking**: Supports a park function, enabling the mount to return to a predefined safe position when not in use, protecting equipment and ensuring easy restarts.
 
-For more details on the Alpaca API, refer to the [Alpaca REST API specification](https://ascom-standards.org/Alpaca/).
+For more details on the Alpaca API, refer to the [Alpaca REST API specification](https://ascom-standards.org/api/).
 Please note that not all endpoints are currently implemented; future updates will include additional functions, such as guiding support with GuidePulse.
 
 ## Planned Enhancements
