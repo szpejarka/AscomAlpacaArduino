@@ -13,7 +13,7 @@ This setup allows users to operate the mount using older Windows applications th
 ## Features
 
 - **Wi-Fi Communication**: Enables remote control and monitoring of mount functions through an intuitive REST API.
-- **Alpaca REST API Compatibility**: Provides integration with popular astronomical software via the Alpaca standard. Although some API endpoints are still under development, the current implementation supports essential operations like asynchronous slewing and sidereal-speed tracking.
+- **Alpaca REST API Compatibility**: Provides integration with popular astronomical software via the Alpaca-ASCOM standard.
 - **Precision Tracking**: By utilizing interrupt-driven microstepping for RA and Dec motors, the ESP32 controller ensures highly precise timing, crucial for maintaining smooth tracking and alignment accuracy.
 - **Remote Control Compatibility**: Integrates with NINA and other platforms, enabling functions such as Slew with Plate Solving and Polar Alignment adjustments.
 
