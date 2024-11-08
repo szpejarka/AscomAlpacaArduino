@@ -10,16 +10,7 @@ Additionally, a GPS module is used to accurately determine location data, aligni
 Leveraging the Alpaca REST API, the system ensures compatibility with both modern and legacy applications through bridging services such as [Device Hub](https://ascom-standards.org/FAQs/DevHub.htm), which translates Alpaca API calls to the ASCOM standard.
 This setup allows users to operate the mount using older Windows applications that rely on the ASCOM protocol, broadening the system's utility across diverse astrophotography platforms.
 
-## Features
-
-- **Wi-Fi Communication**: Enables remote control and monitoring of mount functions through an intuitive REST API.
-- **Alpaca REST API Compatibility**: Provides integration with popular astronomical software via the Alpaca-ASCOM standard.
-- **Precision Tracking**: By utilizing interrupt-driven microstepping for RA and Dec motors, the ESP32 controller ensures highly precise timing, crucial for maintaining smooth tracking and alignment accuracy.
-- **Remote Control Compatibility**: Integrates with NINA and other platforms, enabling functions such as Slew with Plate Solving and Polar Alignment adjustments.
-
-## System Architecture
-
-### RA and Dec Axes Control
+## RA and Dec Axes Control
 
 The equatorial mount design relies on two primary axes:
 
@@ -30,7 +21,7 @@ Microstepping for both RA and Dec axes is achieved through the use of stepper mo
 The ESP32 controller manages these microsteps via low level **interrupt routines**, ensuring accurate and timely control for each step.
 This level of control is essential for long-exposure astrophotography, where even minor tracking inaccuracies can lead to blurring in the final image.
 
-### Current Implementation of Alpaca REST API
+## Current Implementation of Alpaca REST API
 
 The Alpaca REST API serves as the primary communication layer for this system, facilitating remote control and interaction with astronomical software. Key features include:
 
@@ -40,11 +31,10 @@ The Alpaca REST API serves as the primary communication layer for this system, f
 - **Parking**: Supports a park function, enabling the mount to return to a predefined safe position when not in use, protecting equipment and ensuring easy restarts.
 
 For more details on the Alpaca API, refer to the [Alpaca REST API specification](https://ascom-standards.org/api/).
-Please note that not all endpoints are currently implemented; future updates will include additional functions, such as guiding support with GuidePulse.
+Please note that not all endpoints are currently implemented;
 
 ## Planned Enhancements
 
 In future iterations, additional endpoints and functionalities will be introduced, including:
 
 - **GuidePulse Support**: Implementation of GuidePulse will provide enhanced guiding capabilities, allowing for accurate corrections in real-time during tracking, ideal for long-exposure deep-sky imaging.
-- **Extended Compatibility**: The system will be enhanced to support more ASCOM functions, expanding its integration capabilities with other software.
