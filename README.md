@@ -3,12 +3,12 @@
 ## Project Overview
 
 This project develops a versatile control system for an equatorial astrophotography mount using an **ESP32 microcontroller**.
-The system aims to provide precise tracking and control over Right Ascension (RA) and Declination (Dec) axes via stepper motors with microstepping drivers.
+The system aims to provide precise tracking and control over Right Ascension (RA) and Declination (Dec) axes via stepper motors.
 With remote communication capabilities enabled by Wi-Fi, the system allows seamless integration with popular astronomical software such as [N.I.N.A.](https://nighttime-imaging.eu/) and with them supports advanced functions like Slew with Plate Solving and Three-Point Polar Alignment.
 Additionally, a GPS module is used to accurately determine location data, aligning the coordinate system for precise celestial tracking.
 
 Leveraging the Alpaca REST API, the system ensures compatibility with both modern and legacy applications through bridging services such as [Device Hub](https://ascom-standards.org/FAQs/DevHub.htm), which translates Alpaca API calls to the ASCOM standard.
-This setup allows users to operate the mount using older Windows applications that rely on the ASCOM protocol, broadening the system's utility across diverse astrophotography platforms.
+This setup allows users to operate the mount using older Windows applications that rely on the ASCOM protocol.
 
 ## RA and Dec Axes Control
 
@@ -37,4 +37,4 @@ Please note that not all endpoints are currently implemented;
 
 In future iterations, additional endpoints and functionalities will be introduced, including:
 
-- **GuidePulse Support**: Implementation of GuidePulse will provide enhanced guiding capabilities, allowing for accurate corrections in real-time during tracking, ideal for long-exposure deep-sky imaging.
+- **GuidePulse Support**
